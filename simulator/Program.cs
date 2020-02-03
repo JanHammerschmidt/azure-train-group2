@@ -17,7 +17,7 @@ namespace simulator
         // Using the Azure CLI:
         // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyDotnetDevice --output table
         private static string s_connectionString = "HostName=rg2-iothub.azure-devices.net;SharedAccessKey=PNtNXhORLmykHEPHDcYlDLrMaCN5ynYf/a9MaGZjAaE=";
-        private static bool PushInvalidData = false;
+        private static bool PushInvalidData = true;
 
         // Async method to send simulated telemetry
         private static async void SendDeviceToCloudMessagesAsync()
@@ -69,7 +69,7 @@ namespace simulator
             var pushInvalidData = Environment.GetEnvironmentVariable("PUSH_INVALID_DATA");
             if (pushInvalidData != null)
             {
-                PushInvalidData = Boolean.Parse(pushInvalidData);
+                PushInvalidData = bool.Parse(pushInvalidData);
             }
 
             // Connect to the IoT hub using the MQTT protocol
