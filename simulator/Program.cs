@@ -11,11 +11,13 @@ namespace simulator
     class SimulatedDevice
     {
         private static DeviceClient s_deviceClient;
+        private static string s_deviceId = "testdevice1";
 
         // The device connection string to authenticate the device with your IoT hub.
         // Using the Azure CLI:
         // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyDotnetDevice --output table
-        private readonly static string s_connectionString = "HostName=rg2-iothub.azure-devices.net;DeviceId=testdevice1;SharedAccessKey=PNtNXhORLmykHEPHDcYlDLrMaCN5ynYf/a9MaGZjAaE=";
+        private static string s_connectionString = "HostName=rg2-iothub.azure-devices.net;SharedAccessKey=PNtNXhORLmykHEPHDcYlDLrMaCN5ynYf/a9MaGZjAaE=";
+        private static bool PushInvalidData = true;
 
         // Async method to send simulated telemetry
         private static async void SendDeviceToCloudMessagesAsync()
@@ -25,10 +27,14 @@ namespace simulator
 
             while (true)
             {
-                int currentTemperature = -50 + (int)(rand.NextDouble() * 100);
-                int currentWindSpeed = (int)(rand.NextDouble() * 70);
-                int currentWindDirection = (int)(rand.NextDouble() * 359);
-                int currentHumidity = (int)(rand.NextDouble() * 100);
+                int currentTemperature = rand.Next(-50, 50);
+                if (PushInvalidData)
+                {
+                    currentTemperature += 50;
+                }
+                int currentWindSpeed = rand.Next(70);
+                int currentWindDirection = rand.Next(359);
+                int currentHumidity = rand.Next(100);
 
                 // Create JSON message
                 var telemetryDataPoint = new
@@ -36,7 +42,9 @@ namespace simulator
                     temperature = currentTemperature,
                     humidity = currentHumidity,
                     windDirection = currentWindDirection,
-                    windSpeed = currentWindSpeed
+                    windSpeed = currentWindSpeed,
+                    id = Guid.NewGuid(),
+                    deviceId = s_deviceId
                 };
                 var messageString = JsonConvert.SerializeObject(telemetryDataPoint);
                 var message = new Message(Encoding.ASCII.GetBytes(messageString));
@@ -52,8 +60,20 @@ namespace simulator
         {
             Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device. Ctrl-C to exit.\n");
 
+            var deviceId = Environment.GetEnvironmentVariable("DEVICE_ID");
+            if (deviceId != null)
+            {
+                s_deviceId = deviceId;
+            }
+
+            var pushInvalidData = Environment.GetEnvironmentVariable("PUSH_INVALID_DATA");
+            if (pushInvalidData != null)
+            {
+                PushInvalidData = bool.Parse(pushInvalidData);
+            }
+
             // Connect to the IoT hub using the MQTT protocol
-            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, TransportType.Mqtt);
+            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, s_deviceId, TransportType.Mqtt);
             SendDeviceToCloudMessagesAsync();
             Console.ReadLine();
         }
