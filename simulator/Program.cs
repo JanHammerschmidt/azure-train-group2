@@ -63,13 +63,11 @@ namespace simulator
                 s_connectionString = connectionString;
             }
 
-            var pushInvalidData = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            var pushInvalidData = Environment.GetEnvironmentVariable("PUSH_INVALID_DATA");
             if (pushInvalidData != null)
             {
                 PushInvalidData = Boolean.Parse(pushInvalidData);
             }
-
-
 
             // Connect to the IoT hub using the MQTT protocol
             s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, TransportType.Mqtt);
