@@ -1,8 +1,9 @@
 ﻿$erroractionpreference = "stop"
 
 
+$suffix = "test"
 
-$resourceGroup = "gruppe2"
+$resourceGroup = "gruppe2-$suffix"
 $hubName = "rg2-iothub"
 
 az account set --subscription "Azure Schulung"
@@ -18,3 +19,5 @@ if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create iothub"
 }
 
+
+az iot hub device-identity create --device-id testdevice1 --n $hubName
