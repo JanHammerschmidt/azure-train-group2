@@ -15,7 +15,8 @@ namespace simulator
         // The device connection string to authenticate the device with your IoT hub.
         // Using the Azure CLI:
         // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyDotnetDevice --output table
-        private readonly static string s_connectionString = "HostName=rg2-iothub.azure-devices.net;DeviceId=testdevice1;SharedAccessKey=PNtNXhORLmykHEPHDcYlDLrMaCN5ynYf/a9MaGZjAaE=";
+        private static string s_connectionString = "HostName=rg2-iothub.azure-devices.net;DeviceId=testdevice1;SharedAccessKey=PNtNXhORLmykHEPHDcYlDLrMaCN5ynYf/a9MaGZjAaE=";
+        private static bool PushInvalidData = false;
 
         // Async method to send simulated telemetry
         private static async void SendDeviceToCloudMessagesAsync()
@@ -26,6 +27,10 @@ namespace simulator
             while (true)
             {
                 int currentTemperature = -50 + (int)(rand.NextDouble() * 100);
+                if (PushInvalidData)
+                {
+                    currentTemperature += 50;
+                }
                 int currentWindSpeed = (int)(rand.NextDouble() * 70);
                 int currentWindDirection = (int)(rand.NextDouble() * 359);
                 int currentHumidity = (int)(rand.NextDouble() * 100);
@@ -51,6 +56,20 @@ namespace simulator
         private static void Main(string[] args)
         {
             Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device. Ctrl-C to exit.\n");
+
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            if (connectionString != null)
+            {
+                s_connectionString = connectionString;
+            }
+
+            var pushInvalidData = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            if (pushInvalidData != null)
+            {
+                PushInvalidData = Boolean.Parse(pushInvalidData);
+            }
+
+
 
             // Connect to the IoT hub using the MQTT protocol
             s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, TransportType.Mqtt);
