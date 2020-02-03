@@ -4,7 +4,7 @@
 $suffix = "test"
 
 $resourceGroup = "gruppe2-$suffix"
-$hubName = "rg2-iothub"
+$hubName = "rg2-iothub3"
 $datalake = "rg2datalake"
 $storageAccount = "rg2group2storage"
 $tableValid = "valid"
@@ -19,13 +19,14 @@ if ( $LASTEXITCODE -ne 0 ) {
 }
 
 
-az iot hub create --name $hubName  --resource-group $resourceGroup --subscription "Azure Schulung"
+az iot hub create --name $hubName  --resource-group $resourceGroup --subscription "Azure Schulung"  --sku B1
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create iothub"
 }
 
 
-az iot hub device-identity create --device-id testdevice1 --n $hubName
+az iot hub device-identity create --device-id testdevice1 --hub-name $hubName 
+
 
 # create data lake
 Write-Host "datalake"
