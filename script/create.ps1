@@ -12,7 +12,7 @@ $tableInvalid = "invalid"
 
 az account set --subscription "Azure Schulung"
 
-<#
+
 az group create --location "West Europe"   --name $resourceGroup --subscription "Azure Schulung"
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create resourceGroup"
@@ -41,7 +41,6 @@ az storage account create --name $storageAccount --resource-group $resourceGroup
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create storage account"
 }
-#>
 
 Write-Host "get keys"
 $key = (az storage account keys list -g $resourceGroup -n $storageAccount  --query [0].value -o tsv)
