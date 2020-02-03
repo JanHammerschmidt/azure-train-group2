@@ -73,7 +73,7 @@ namespace simulator
             }
 
             // Connect to the IoT hub using the MQTT protocol
-            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, s_deviceId, TransportType.Mqtt);
+            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, TransportType.Mqtt);
             SendDeviceToCloudMessagesAsync();
             Console.ReadLine();
         }
