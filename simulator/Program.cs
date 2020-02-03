@@ -11,6 +11,7 @@ namespace simulator
     class SimulatedDevice
     {
         private static DeviceClient s_deviceClient;
+        private static string s_deviceId="testdevice1";
 
         // The device connection string to authenticate the device with your IoT hub.
         // Using the Azure CLI:
@@ -41,7 +42,9 @@ namespace simulator
                     temperature = currentTemperature,
                     humidity = currentHumidity,
                     windDirection = currentWindDirection,
-                    windSpeed = currentWindSpeed
+                    windSpeed = currentWindSpeed,
+                    id = Guid.NewGuid(),
+                    deviceId = s_deviceId
                 };
                 var messageString = JsonConvert.SerializeObject(telemetryDataPoint);
                 var message = new Message(Encoding.ASCII.GetBytes(messageString));
@@ -58,9 +61,9 @@ namespace simulator
             Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device. Ctrl-C to exit.\n");
 
             var deviceId = Environment.GetEnvironmentVariable("DEVICE_ID");
-            if (deviceId == null)
+            if (deviceId != null)
             {
-                deviceId = "testdevice1";
+                s_deviceId = deviceId;
             }
 
             var pushInvalidData = Environment.GetEnvironmentVariable("PUSH_INVALID_DATA");
@@ -70,7 +73,7 @@ namespace simulator
             }
 
             // Connect to the IoT hub using the MQTT protocol
-            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, deviceId, TransportType.Mqtt);
+            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, s_deviceId, TransportType.Mqtt);
             SendDeviceToCloudMessagesAsync();
             Console.ReadLine();
         }
