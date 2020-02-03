@@ -11,7 +11,7 @@ namespace simulator
     class SimulatedDevice
     {
         private static DeviceClient s_deviceClient;
-        private static string s_deviceId="testdevice1";
+        private static string s_deviceId = "testdevice1";
 
         // The device connection string to authenticate the device with your IoT hub.
         // Using the Azure CLI:
@@ -27,14 +27,14 @@ namespace simulator
 
             while (true)
             {
-                int currentTemperature = -50 + (int)(rand.NextDouble() * 100);
+                int currentTemperature = rand.Next(-50, 50);
                 if (PushInvalidData)
                 {
                     currentTemperature += 50;
                 }
-                int currentWindSpeed = (int)(rand.NextDouble() * 70);
-                int currentWindDirection = (int)(rand.NextDouble() * 359);
-                int currentHumidity = (int)(rand.NextDouble() * 100);
+                int currentWindSpeed = rand.Next(70);
+                int currentWindDirection = rand.Next(359);
+                int currentHumidity = rand.Next(100);
 
                 // Create JSON message
                 var telemetryDataPoint = new
