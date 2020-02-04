@@ -12,7 +12,7 @@
    
    - add table `sensorerror` as output (alias: `invalid` partion key: `deviceid`; row key: `id`)
    
-   - add data lake (`Blob storage/Data Lake Storage Gen2`) `sensordata`as output (alias `lake`; path pattern: `sensordata/{date}/{time}`; authentication mode: connection string)
+   - add data lake (`Blob storage/Data Lake Storage Gen2`) `sensordata`as output (alias `lake`; path pattern: `sensordata/{date}/{time}`; authentication mode: connection string; format: `json`)
    
    - create a user-defined function
    
