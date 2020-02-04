@@ -25,6 +25,7 @@ $errorDataTableName = "sensorerror"
 # Basic set up
 az login
 az account set --subscription $subscriptionName
+az extension add --name azure-cli-iot-ext
 
 # Basic set up for Powershell
 Connect-AzAccount
