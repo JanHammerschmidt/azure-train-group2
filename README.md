@@ -8,11 +8,11 @@
   
 - add `rg2iothub` as input (alias: `iothub`)
   
-   - add table `sensorvalid`  as output (alias: `valid`; partion key: `deviceid`)
+   - add table `sensorvalid`  as output (alias: `valid`; partion key: `deviceid`; row key: `id`)
    
-   - add table `sensorerror` as output (alias: `invalid` partion key: `deviceid`)
+   - add table `sensorerror` as output (alias: `invalid` partion key: `deviceid`; row key: `id`)
    
-   - add data lake `sensordata`as output (alias `lake`)
+   - add data lake (`Blob storage/Data Lake Storage Gen2`) `sensordata`as output (alias `lake`; path pattern: `sensordata/{date}/{time}`; authentication mode: connection string)
    
    - create a user-defined function
    
@@ -26,7 +26,7 @@
      }
      ```
      
-   - add the following query
+   - add the following query (Javascript UDF)
    
      ```
      WITH enriched AS (
