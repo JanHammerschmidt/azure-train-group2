@@ -2,7 +2,7 @@
 
 
 
-1. execute `script/create.ps1` and `script/create_part2.ps1` to create azure resources
+1. execute `script/create.ps1` and `script/create_part2.ps1` and `script/create_part3.ps1` to create azure resources
 
 2. configure stream analytics
   
