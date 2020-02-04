@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure;
 using Microsoft.Azure.Storage;
+using System.Linq;
 
 namespace api.Controllers
 {
@@ -19,25 +20,26 @@ namespace api.Controllers
         };
 
         private readonly ILogger<DevicesController> _logger;
+        private readonly DevicesService _devService;
 
-        public DevicesController(ILogger<DevicesController> logger)
+        public DevicesController(ILogger<DevicesController> logger, DevicesService devService)
         {
             _logger = logger;
-
-
+            _devService = devService;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<string> Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return new List<string>() { "testdevice1", "testdevice2" };
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        async public Task<List<SensorValue>> GetDevice(string id)
+        {
+            return (await _devService.GetAllValidData()).Where(x => x.DeviceId == id).ToList();
+            // return _devService.GetDeviceHistory(id);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<DevicesService>();
             services.AddCors(options =>
             {
                 options.AddPolicy("default",
