@@ -31,7 +31,7 @@ if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create app service plan."
 }
 
-az functionapp create --location $location --resource-group $resourceGroup --name $functionAppName --storageaccount $storageAccountName --app-insights $insightsName --plan $appServicePlanName --runtime dotnet
+az functionapp create --resource-group $resourceGroup --name $functionAppName --storage-account $storageAccountName --app-insights $insightsName --plan $appServicePlanName --runtime dotnet
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create function app."
 }
