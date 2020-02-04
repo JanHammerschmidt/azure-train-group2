@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "",
+    "appService.defaultWebAppToDeploy": "/subscriptions/4d1481a4-917d-4622-9fb6-6bcbe31470b2/resourceGroups/rg2-test/providers/Microsoft.Web/sites/rg2WebAppApi"
+}
