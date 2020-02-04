@@ -1,65 +1,80 @@
-﻿$erroractionpreference = "stop"
+Import-Module Az
+$erroractionpreference = "stop"
 
-
+$subscriptionName = "Azure Schulung"
 $suffix = "test"
+$resourceGroup = "rg2-$suffix"
+$location = "WestEurope"
 
-$resourceGroup = "gruppe2-$suffix"
-$hubName = "rg2-iothub3"
-$datalake = "rg2datalake"
-$storageAccount = "rg2group2storage"
-$tableValid = "valid"
-$tableInvalid = "invalid"
+$lockName = "NoDeleteLock"
 
-az account set --subscription "Azure Schulung"
+$hubName = "rg2iothub"
+$testDeviceName = "testdevice1"
+
+$streamAnalyticsName = "rg2streamanalytics"
+$storageAccountName = "rg2storageaccount"
+
+# Storage account stuff
+$dataLakeName = "sensordata"
+$validDataTableName = "sensorvalid"
+$errorDataTableName = "sensorerror"
 
 
-az group create --location "West Europe"   --name $resourceGroup --subscription "Azure Schulung"
+# Start deploying resources
+
+# Basic set up
+az login
+az account set --subscription $subscriptionName
+
+# Basic set up for Powershell
+Connect-AzAccount
+Get-AzSubscription -SubscriptionName $subscriptionName | Select-AzSubscription
+
+
+# Resource group
+az group create --location $location --name $resourceGroup 
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create resourceGroup"
 }
 
-
-az iot hub create --name $hubName  --resource-group $resourceGroup --subscription "Azure Schulung"  --sku B1
+# Hub + Test device
+az iot hub create --location $location --name $hubName  --resource-group $resourceGroup --sku B1
+ 
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create iothub"
 }
-
-
-az iot hub device-identity create --device-id testdevice1 --hub-name $hubName 
-
-
-# create data lake
-Write-Host "datalake"
-az dls account create --account $datalake --resource-group $resourceGroup
+az iot hub device-identity create --device-id $testDeviceName --hub-name $hubName 
 if ( $LASTEXITCODE -ne 0 ) {
-    THROW "Failed to create datalake"
+    THROW "Failed to create test device on iothub"
 }
 
+# Stream analytics job
+New-AzStreamAnalyticsJob -ResourceGroupName $resourceGroup -File "streamanalyticsjobconfig.json" -Name $streamAnalyticsName -Force -Location $location
+if ( $LASTEXITCODE -ne 0 ) {
+    THROW "Failed to create stream analytics job"
+}
 
-# create storage acount
-write-host "storage account"
-az storage account create --name $storageAccount --resource-group $resourceGroup --sku Standard_LRS
+# Storage account and its resources
+
+az storage account create --name $storageAccountName --resource-group $resourceGroup --sku Standard_LRS --kind StorageV2 --enable-hierarchical-namespace true --location $location
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create storage account"
 }
 
-Write-Host "get keys"
-$key = (az storage account keys list -g $resourceGroup -n $storageAccount  --query [0].value -o tsv)
+az storage container create --account-name $storageAccountName --name $dataLakeName
 if ( $LASTEXITCODE -ne 0 ) {
-    THROW "Failed to get keys"
+    THROW "Failed to create gen2 data lake"
 }
 
-write-host $key
-
-Write-Host "created table $tableValid"
-
-az storage table create --name $tableValid --account-name $storageAccount --account-key $key   
+az storage table create --name $validDataTableName --account-name $storageAccountName 
 if ( $LASTEXITCODE -ne 0 ) {
-    THROW "Failed to create table $tableValid"
+    THROW "Failed to create $validDataTableName"
 }
 
-Write-Host "created table $tableInvalid"
-az storage table create --name $tableInvalid --account-name $storageAccount --account-key $key   
+az storage table create --name $errorDataTableName --account-name $storageAccountName 
 if ( $LASTEXITCODE -ne 0 ) {
-    THROW "Failed to create table $tableInvalid"
+    THROW "Failed to create $errorDataTableName"
 }
+
+az lock create --lock-type CanNotDelete --name $lockName --resource-group $resourceGroup
+
