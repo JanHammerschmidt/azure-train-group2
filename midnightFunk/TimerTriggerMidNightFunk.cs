@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -17,7 +18,8 @@ namespace CommaSoft.Gruppe2
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-            var account = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=rg2group2storage;AccountKey=DJIQH2Yy+aY8ywHhrp7Mn4dwXgVZ2k2FOG2CAkwVZC7f39qyouEqqeBXzgrvVNNY8hh3rVYmrmGV6ScpQ8NRxg==;EndpointSuffix=core.windows.net");
+            var config = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddEnvironmentVariables().Build();
+            var account = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(config["STORAGE_CONNECTION_STRING"]);
             var client = account.CreateCloudTableClient();
             var validCounters = await CountPackets(client, "valid");
             var invalidCounters = await CountPackets(client, "invalid");
