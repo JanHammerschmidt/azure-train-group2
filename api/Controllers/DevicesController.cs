@@ -26,10 +26,9 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<string>> Get()
+        async public Task<IEnumerable<string>> Get()
         {
-            return await _devService.GetDeviceHistory();
-            return new List<string>() { "testdevice1", "testdevice2" };
+            return await _devService.GetDevices();
         }
 
         [HttpGet]
