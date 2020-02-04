@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -16,7 +18,8 @@ namespace CommaSoft.Gruppe2
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-            var account = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=rg2group2storage;AccountKey=DJIQH2Yy+aY8ywHhrp7Mn4dwXgVZ2k2FOG2CAkwVZC7f39qyouEqqeBXzgrvVNNY8hh3rVYmrmGV6ScpQ8NRxg==;EndpointSuffix=core.windows.net");
+            var config = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddEnvironmentVariables().Build();
+            var account = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(config["STORAGE_CONNECTION_STRING"]);
             var client = account.CreateCloudTableClient();
             var validCounters = await CountPackets(client, "valid");
             var invalidCounters = await CountPackets(client, "invalid");
@@ -25,15 +28,20 @@ namespace CommaSoft.Gruppe2
             var totalPackets = validCounters.Sum(x => x.Value);
             log.LogInformation($"received {totalPackets} packets from {validCounters.Keys.Count} different devices.");
 
+            var totalInvalidPackets = invalidCounters.Sum(x => x.Value);
+            log.LogInformation($"received {totalInvalidPackets} invalid packets from {invalidCounters.Keys.Count} different devices.");
 
-            foreach (var device in validCounters.Keys)
+            var worstTenDevices = invalidCounters.OrderByDescending(pair => pair.Value).Take(10).Select(pair => pair.Key);
+
+            var sb = new StringBuilder();
+            sb.Append("Worst 10 devices:\n");
+            var i = 0;
+            foreach (var device in worstTenDevices)
             {
-                log.LogInformation($"device {device} has sent {validCounters[device]} valid packets.");
+                i++;
+                sb.Append($"{i}. {device} had {invalidCounters[device]} invalid packets");
             }
-            foreach (var device in invalidCounters.Keys)
-            {
-                log.LogInformation($"device {device} has sent {invalidCounters[device]} invalid packets.");
-            }
+            log.LogInformation(sb.ToString());
         }
         private static async Task<Dictionary<string, long>> CountPackets(CloudTableClient client, string tableName)
         {
