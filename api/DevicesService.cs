@@ -1,9 +1,9 @@
 
-using Microsoft.Azure.Storage;
-using Microsoft.Azure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.CosmosDB.Table;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace api
@@ -30,13 +30,13 @@ namespace api
         public async Task<List<SensorValue>> GetAllValidData()
         {
             var sensorvalid = TableClient.GetTableReference("sensorvalid");
-            var query = sensorvalid.CreateQuery<SensorValue>();
+            var query = new TableQuery<SensorValue>();
             var nextQuery = query;
             var continuationToken = default(TableContinuationToken);
             var results = new List<SensorValue>();
             do
             {
-                var queryResult = await query.ExecuteSegmentedAsync(continuationToken).ConfigureAwait(false);
+                var queryResult = await sensorvalid.ExecuteQuerySegmentedAsync(query, continuationToken).ConfigureAwait(false);
                 results.AddRange(queryResult.Results);
                 continuationToken = queryResult.ContinuationToken;
                 if (continuationToken != null && query.TakeCount.HasValue)
@@ -55,10 +55,14 @@ namespace api
             return results;
         }
 
-        public List<int> GetDeviceHistory(string id)
+        async public Task<List<string>> GetDevices()
         {
+            return (await GetAllValidData()).Select(x => x.deviceId).Distinct().ToList();
+        }
 
-            return new List<int> { 1, 2, 3 };
+        async public Task<List<SensorValue>> GetDeviceHistory(string id)
+        {
+            return (await GetAllValidData()).Where(x => x.deviceId == id).ToList();
         }
     }
 }

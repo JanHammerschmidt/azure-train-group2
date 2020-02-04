@@ -4,9 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure;
-using Microsoft.Azure.Storage;
-using System.Linq;
 
 namespace api.Controllers
 {
@@ -29,17 +26,17 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<string> Get()
+        public Task<IEnumerable<string>> Get()
         {
+            return await _devService.GetDeviceHistory();
             return new List<string>() { "testdevice1", "testdevice2" };
         }
 
         [HttpGet]
         [Route("{id}")]
-        async public Task<List<SensorValue>> GetDevice(string id)
+        public async Task<List<SensorValue>> GetDevice(string id)
         {
-            return (await _devService.GetAllValidData()).Where(x => x.DeviceId == id).ToList();
-            // return _devService.GetDeviceHistory(id);
+            return await _devService.GetDeviceHistory(id);
         }
     }
 }
