@@ -8,9 +8,9 @@
   
 - add `rg2iothub` as input (alias: `iothub`)
   
-   - add table `sensorvalid`  as output (alias: `valid`)
+   - add table `sensorvalid`  as output (alias: `valid`; partion key: `deviceid`)
    
-   - add table `sensorerror` as output (alias: `invalid`)
+   - add table `sensorerror` as output (alias: `invalid` partion key: `deviceid`)
    
    - add data lake `sensordata`as output (alias `lake`)
    
