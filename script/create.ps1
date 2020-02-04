@@ -50,7 +50,7 @@ if ( $LASTEXITCODE -ne 0 ) {
 }
 
 # Stream analytics job
-New-AzStreamAnalyticsJob -ResourceGroupName $resourceGroup -File "streamanalyticsjobconfig.json" -Name $streamAnalyticsName -Force -Location $location
+New-AzStreamAnalyticsJob -ResourceGroupName $resourceGroup -File "streamanalyticsjobconfig.json" -Name $streamAnalyticsName -Force
 if ( $LASTEXITCODE -ne 0 ) {
     THROW "Failed to create stream analytics job"
 }
