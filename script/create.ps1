@@ -78,4 +78,7 @@ if ( $LASTEXITCODE -ne 0 ) {
 }
 
 az lock create --lock-type CanNotDelete --name $lockName --resource-group $resourceGroup
+if ( $LASTEXITCODE -ne 0 ) {
+    THROW "Failed to create resource lock"
+}
 
